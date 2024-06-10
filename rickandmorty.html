@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rick and Morty</title>
+    <style>
+        body {
+            background-color: #a0af94;
+            color: white;
+            font-family: Arial, sans-serif;
+            background-image: url('rickandmorty.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .character-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .character-card {
+            text-align: center;
+            background-color: #547a57;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .character-card img {
+            width: 150px;
+            height: auto;
+            border-radius: 50%;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .modal-content {
+            background-color: #114b33;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            border-radius: 10px;
+            width: 70%;
+            max-width: 600px;
+        }
+        .close {
+            color: white;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+            color: #ccc;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div style="margin: 10px;">
+        <nav class="navbar navbar-light" style="background-color: rgb(45, 82, 58);">
+            <div class="container">
+                <a class="navbar-brand" href="index.html" style="color: rgb(0, 0, 0); font-family: 'Maputo', sans-serif; font-size: xx-large;">Inicio</a>
+                <style>
+                    @import url('https://fonts.cdnfonts.com/css/maputo');
+                </style>
+            </div>
+        </nav>
+    </div>
+    <div class="character-container" id="character-container"></div>
+
+    <!-- Modal para mostrar la descripción del personaje -->
+    <div id="characterModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const characterContainer = document.getElementById('character-container');
+
+            fetch('https://rickandmortyapi.com/api/character/')
+                .then(response => response.json())
+                .then(data => {
+                    const characters = data.results;
+
+                    characters.forEach(character => {
+                        const card = document.createElement('div');
+                        card.classList.add('character-card');
+
+                        const img = document.createElement('img');
+                        img.src = character.image;
+
+                        const name = document.createElement('div');
+                        name.textContent = character.name;
+
+                        card.appendChild(img);
+                        card.appendChild(name);
+
+                        card.addEventListener('click', () => {
+                            const modal = document.getElementById('characterModal');
+                            const modalContent = document.getElementById('modal-content');
+
+                            const description = `
+                                <img src="${character.image}" alt="${character.name}">
+                                <div>Name: ${character.name}</div>
+                                <div>Status: ${character.status}</div>
+                                <div>Species: ${character.species}</div>
+                                <div>Location: ${character.location.name}</div>
+                                <div>Origin: ${character.origin.name}</div>
+                            `;
+
+                            modalContent.innerHTML = description;
+
+                            modal.style.display = 'block';
+                        });
+
+                        characterContainer.appendChild(card);
+                    });
+                })
+                .catch(error => console.error('Error fetching character data:', error));
+        });
+
+        document.querySelector('.close').addEventListener('click', () => {
+            document.getElementById('characterModal').style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            const modal = document.getElementById('characterModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
